@@ -1,0 +1,352 @@
+/* Admin Task Assignment Styles */
+.sidebar {
+    background-color: #001e3c;
+    color: white;
+    min-height: 100vh;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 20px 15px;
+    background-color: #001225;
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 15px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+.sidebar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+/* Table Styles */
+.table th {
+    background-color: #001e3c;
+    color: white;
+    border-color: #001e3c;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 30, 60, 0.05);
+}
+
+/* Status Badges */
+.badge-status-pending {
+    background-color: #ffc107;
+    color: #001e3c;
+}
+
+.badge-status-in-progress {
+    background-color: #0dcaf0;
+    color: #001e3c;
+}
+
+.badge-status-completed {
+    background-color: #198754;
+}
+
+/* Priority Badges */
+.badge-priority-low {
+    background-color: #198754;
+}
+
+.badge-priority-medium {
+    background-color: #ffc107;
+    color: #001e3c;
+}
+
+.badge-priority-high {
+    background-color: #dc3545;
+}
+
+/* Progress Bars */
+.task-progress {
+    width: 100px;
+    height: 20px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.task-progress-bar {
+    height: 100%;
+    background-color: #198754;
+    transition: width 0.3s;
+}
+
+.progress-text {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Due Date Styles */
+.due-date {
+    font-size: 0.875rem;
+}
+
+.due-date.overdue {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.due-date.today {
+    color: #fd7e14;
+    font-weight: bold;
+}
+
+.due-date.future {
+    color: #198754;
+}
+
+/* Action Buttons */
+.btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Task Description Preview */
+.task-description {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Progress Range Slider */
+.form-range {
+    width: 100%;
+}
+
+#progressValue {
+    font-weight: bold;
+    color: #001e3c;
+}
+
+/* Tab Styles */
+.nav-tabs .nav-link {
+    color: #001e3c;
+    border: 1px solid transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: #001e3c;
+    border-color: #dee2e6 #dee2e6 #fff;
+    font-weight: bold;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .task-description {
+        max-width: 150px;
+    }
+    
+    .task-progress {
+        width: 80px;
+    }
+    
+    .btn-group .btn {
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .progress-text {
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .task-progress {
+        width: 60px;
+        height: 15px;
+    }
+    
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+}
+
+/* Animation for progress bars */
+@keyframes progressAnimation {
+    0% {
+        width: 0%;
+    }
+}
+
+.task-progress-bar {
+    animation: progressAnimation 1s ease-in-out;
+}
+
+/* Hover effects for task rows */
+.task-row:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Priority indicators */
+.priority-indicator {
+    width: 4px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.priority-high .priority-indicator {
+    background-color: #dc3545;
+}
+
+.priority-medium .priority-indicator {
+    background-color: #ffc107;
+}
+
+.priority-low .priority-indicator {
+    background-color: #198754;
+}
+
+/* Task status colors for rows */
+.task-row.status-pending {
+    border-left: 4px solid #ffc107;
+}
+
+.task-row.status-in-progress {
+    border-left: 4px solid #0dcaf0;
+}
+
+.task-row.status-completed {
+    border-left: 4px solid #198754;
+    opacity: 0.8;
+}
+
+/* Custom checkboxes for task completion */
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #dee2e6;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.task-checkbox.checked {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+
+.task-checkbox:hover {
+    border-color: #001e3c;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #001e3c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success states */
+.success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Warning states */
+.warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+/* Error states */
+.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}

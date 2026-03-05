@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - Church Youth System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auth.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+</head>
+<body class="auth-page">
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-4">
+                <div class="auth-card card shadow">
+                    <div class="card-header text-center py-4">
+                        <img src="images/YOUTH-MINISTRY-LOGO 2.png" alt="Church Logo" height="60">
+                        <h4 class="mt-3">Church of Pentecost Youth Ministry, Amamorley Central</h4>
+                        <div class="auth-toggle mt-3">
+                            <button class="btn btn-sm btn-outline-primary active" id="memberBtn" onclick="console.log('Member clicked')">Member</button>
+                            <button class="btn btn-sm btn-outline-warning" id="adminBtn" onclick="console.log('Admin clicked'); showAdminLogin()">Admin</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Member Login Form -->
+                        <div id="memberLoginForm">
+                            <h5 class="text-center mb-4">Member Login</h5>
+                            <form id="memberLogin">
+                                <div class="mb-3">
+                                    <label for="memberEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="memberEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="memberPassword" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="memberPassword" required>
+                                        <span class="input-group-text toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                                <div class="text-center">
+                                    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                                </div>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                            </div>
+                        </div>
+
+                        <!-- Member Signup Form -->
+                        <div id="memberSignupForm" class="d-none">
+                            <h5 class="text-center mb-4">Member Sign Up</h5>
+                            <form id="memberSignup">
+                                <div class="mb-3">
+                                    <label for="signupName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="signupName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="signupEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="signupEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="signupPhone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="signupPhone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="signupDateOfBirth" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="signupDateOfBirth" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="signupLocation" class="form-label">Location/Address</label>
+                                    <input type="text" class="form-control" id="signupLocation" placeholder="e.g., Accra, Ghana" required>
+                                    <div class="form-text">Enter your city or area</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="signupPassword" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="signupPassword" minlength="8" required>
+                                        <span class="input-group-text toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <div class="form-text">Password must be at least 8 characters long.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                        <span class="input-group-text toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+                            </div>
+                        </div>
+
+                        <!-- Admin Login Form -->
+                        <div id="adminLoginForm" class="d-none">
+                            <h5 class="text-center mb-4">Admin Login</h5>
+                            <form id="adminLogin">
+                                <div class="mb-3">
+                                    <label for="adminEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="adminEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="adminPassword" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="adminPassword" required>
+                                        <span class="input-group-text toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="adminRemember">
+                                    <label class="form-check-label" for="adminRemember">Remember me</label>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100">Login</button>
+                            </form>
+                        </div>
+
+                        <!-- Forgot Password Form -->
+                        <div id="forgotPasswordForm" class="d-none">
+                            <h5 class="text-center mb-4">Reset Password</h5>
+                            <form id="forgotPassword">
+                                <div class="mb-3">
+                                    <label for="resetEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="resetEmail" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 mb-3">Send OTP</button>
+                            </form>
+                            <div class="text-center">
+                                <a href="#" id="backToLogin">Back to Login</a>
+                            </div>
+                        </div>
+
+                        <!-- OTP Verification Form -->
+                        <div id="otpForm" class="d-none">
+                            <h5 class="text-center mb-4">Enter OTP</h5>
+                            <form id="verifyOtp">
+                                <div class="mb-3">
+                                    <label for="otpCode" class="form-label">OTP Code</label>
+                                    <input type="text" class="form-control" id="otpCode" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="newPassword" minlength="8" required>
+                                        <span class="input-group-text toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Reset Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Inline backup function in case auth.js doesn't load
+    function showAdminLogin() {
+        console.log('showAdminLogin called');
+        document.getElementById('memberBtn').classList.remove('active');
+        document.getElementById('adminBtn').classList.add('active');
+        document.getElementById('memberLoginForm').classList.add('d-none');
+        document.getElementById('memberSignupForm').classList.add('d-none');
+        document.getElementById('adminLoginForm').classList.remove('d-none');
+        document.getElementById('forgotPasswordForm').classList.add('d-none');
+        document.getElementById('otpForm').classList.add('d-none');
+    }
+    
+    function showMemberLogin() {
+        console.log('showMemberLogin called');
+        document.getElementById('memberBtn').classList.add('active');
+        document.getElementById('adminBtn').classList.remove('active');
+        document.getElementById('memberLoginForm').classList.remove('d-none');
+        document.getElementById('memberSignupForm').classList.add('d-none');
+        document.getElementById('adminLoginForm').classList.add('d-none');
+        document.getElementById('forgotPasswordForm').classList.add('d-none');
+        document.getElementById('otpForm').classList.add('d-none');
+    }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="sms-provider.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>
