@@ -65,6 +65,10 @@ function setupEventsEventListeners() {
     
     // Comment form
     document.getElementById('commentForm').addEventListener('submit', handleCommentSubmit);
+
+    // Purchase ticket listeners
+    document.getElementById('confirmPurchase').addEventListener('click', handlePurchaseConfirm);
+    document.getElementById('printTickets').addEventListener('click', handlePrintTickets);
 }
 
 // Toggle sidebar on mobile
@@ -285,7 +289,41 @@ async function showEventDetails(eventId) {
         // Update modal title
         document.getElementById('eventModalTitle').textContent = event.title;
         
-        // Update event details
+        // Build ticket tiers display
+        let ticketTiersHtml = '';
+        if (event.tickets) {
+            const purchasedTickets = JSON.parse(localStorage.getItem('purchasedTickets') || '[]');
+            const eventPurchases = purchasedTickets.filter(t => t.eventId === event.id);
+
+            const tiers = [
+                { key: 'regular', label: 'Regular' },
+                { key: 'vip', label: 'VIP' },
+                { key: 'vvip', label: 'VVIP' }
+            ];
+
+            tiers.forEach(tier => {
+                const tierData = event.tickets[tier.key];
+                if (tierData && tierData.total > 0) {
+                    const sold = eventPurchases.filter(t => t.tier === tier.key).length;
+                    const available = Math.max(0, tierData.total - sold);
+                    ticketTiersHtml += `
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center ${available === 0 ? 'border-danger' : 'border-success'}">
+                                <div class="card-body">
+                                    <h6 class="card-title">${tier.label}</h6>
+                                    <h4 class="text-primary">GHS ${tierData.price.toFixed(2)}</h4>
+                                    <p class="mb-0 ${available === 0 ? 'text-danger' : 'text-success'}">
+                                        ${available === 0 ? 'Sold Out' : available + ' tickets available'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Update event details - only show ticket tier prices and availability
         document.getElementById('eventDetails').innerHTML = `
             <div class="row">
                 <div class="col-md-6">
@@ -307,7 +345,27 @@ async function showEventDetails(eventId) {
                     <p>${event.description}</p>
                 </div>
             </div>
+            ${ticketTiersHtml ? `
+                <hr>
+                <h6>Tickets</h6>
+                <div class="row">${ticketTiersHtml}</div>
+                ${!isPast ? `
+                    <div class="text-center mt-2">
+                        <button class="btn btn-success btn-lg" id="buyTicketsBtn" data-event-id="${event.id}">
+                            <i class="fas fa-ticket-alt me-2"></i>Buy Tickets
+                        </button>
+                    </div>
+                ` : ''}
+            ` : ''}
         `;
+
+        // Attach buy tickets listener
+        const buyBtn = document.getElementById('buyTicketsBtn');
+        if (buyBtn) {
+            buyBtn.addEventListener('click', function() {
+                openPurchaseModal(this.dataset.eventId);
+            });
+        }
         
         // Set event ID for comments
         document.getElementById('commentEventId').value = eventId;
@@ -393,4 +451,293 @@ function formatDateTime(dateTimeString) {
         minute: '2-digit'
     };
     return new Date(dateTimeString).toLocaleDateString(undefined, options);
+}
+
+// Generate a unique ticket ID
+function generateTicketId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let id = 'TKT-';
+    for (let i = 0; i < 8; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    id += '-' + Date.now().toString(36).toUpperCase();
+    return id;
+}
+
+// Open purchase modal for an event
+function openPurchaseModal(eventId) {
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    const event = events.find(e => e.id === eventId);
+    if (!event || !event.tickets) return;
+
+    document.getElementById('purchaseEventId').value = eventId;
+
+    const purchasedTickets = JSON.parse(localStorage.getItem('purchasedTickets') || '[]');
+    const eventPurchases = purchasedTickets.filter(t => t.eventId === eventId);
+
+    const tiers = [
+        { key: 'regular', label: 'Regular' },
+        { key: 'vip', label: 'VIP' },
+        { key: 'vvip', label: 'VVIP' }
+    ];
+
+    let selectionHtml = '<h6>' + event.title + '</h6><p class="text-muted">Select the number of tickets per tier</p>';
+    selectionHtml += '<table class="table"><thead><tr><th>Tier</th><th>Price</th><th>Available</th><th>Quantity</th></tr></thead><tbody>';
+
+    tiers.forEach(tier => {
+        const tierData = event.tickets[tier.key];
+        if (tierData && tierData.total > 0) {
+            const sold = eventPurchases.filter(t => t.tier === tier.key).length;
+            const available = Math.max(0, tierData.total - sold);
+            selectionHtml += `
+                <tr>
+                    <td><strong>${tier.label}</strong></td>
+                    <td>GHS ${tierData.price.toFixed(2)}</td>
+                    <td>${available}</td>
+                    <td>
+                        <input type="number" class="form-control ticket-qty" 
+                               data-tier="${tier.key}" data-price="${tierData.price}" 
+                               min="0" max="${available}" value="0" 
+                               ${available === 0 ? 'disabled' : ''}>
+                    </td>
+                </tr>
+            `;
+        }
+    });
+
+    selectionHtml += '</tbody></table>';
+    selectionHtml += '<p class="text-info small"><i class="fas fa-info-circle me-1"></i>A 10% booking fee applies per ticket.</p>';
+
+    document.getElementById('ticketSelectionArea').innerHTML = selectionHtml;
+    document.getElementById('purchaseSummary').classList.add('d-none');
+
+    // Attach quantity change listeners to update summary
+    document.querySelectorAll('.ticket-qty').forEach(input => {
+        input.addEventListener('input', updatePurchaseSummary);
+    });
+
+    // Close event details modal and open purchase modal
+    const eventModal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+    if (eventModal) eventModal.hide();
+
+    setTimeout(() => {
+        const purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+        purchaseModal.show();
+    }, 300);
+}
+
+// Update purchase summary with booking fee
+function updatePurchaseSummary() {
+    const qtyInputs = document.querySelectorAll('.ticket-qty');
+    let summaryHtml = '<table class="table table-sm"><thead><tr><th>Tier</th><th>Qty</th><th>Unit Price</th><th>Booking Fee (10%)</th><th>Subtotal</th></tr></thead><tbody>';
+    let grandTotal = 0;
+    let totalTickets = 0;
+
+    qtyInputs.forEach(input => {
+        const qty = parseInt(input.value) || 0;
+        if (qty > 0) {
+            const price = parseFloat(input.dataset.price);
+            const tier = input.dataset.tier;
+            const bookingFeePerTicket = price * 0.10;
+            const subtotal = qty * (price + bookingFeePerTicket);
+            grandTotal += subtotal;
+            totalTickets += qty;
+
+            summaryHtml += `
+                <tr>
+                    <td>${tier.toUpperCase()}</td>
+                    <td>${qty}</td>
+                    <td>GHS ${price.toFixed(2)}</td>
+                    <td>GHS ${bookingFeePerTicket.toFixed(2)}</td>
+                    <td>GHS ${subtotal.toFixed(2)}</td>
+                </tr>
+            `;
+        }
+    });
+
+    summaryHtml += '</tbody></table>';
+
+    if (totalTickets > 0) {
+        summaryHtml += `<h5 class="text-end">Total: GHS ${grandTotal.toFixed(2)}</h5>`;
+        summaryHtml += `<p class="text-muted text-end small">${totalTickets} ticket(s) including 10% booking fee per ticket</p>`;
+        document.getElementById('summaryDetails').innerHTML = summaryHtml;
+        document.getElementById('purchaseSummary').classList.remove('d-none');
+    } else {
+        document.getElementById('purchaseSummary').classList.add('d-none');
+    }
+}
+
+// Handle purchase confirmation
+function handlePurchaseConfirm() {
+    const eventId = document.getElementById('purchaseEventId').value;
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        alert('You must be logged in to purchase tickets');
+        return;
+    }
+
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    const event = events.find(e => e.id === eventId);
+    if (!event) {
+        alert('Event not found');
+        return;
+    }
+
+    const qtyInputs = document.querySelectorAll('.ticket-qty');
+    const purchasedTickets = JSON.parse(localStorage.getItem('purchasedTickets') || '[]');
+    const eventPurchases = purchasedTickets.filter(t => t.eventId === eventId);
+    const newTickets = [];
+
+    let hasSelection = false;
+
+    qtyInputs.forEach(input => {
+        const qty = parseInt(input.value) || 0;
+        if (qty > 0) {
+            hasSelection = true;
+            const tier = input.dataset.tier;
+            const price = parseFloat(input.dataset.price);
+            const bookingFee = price * 0.10;
+
+            // Check availability
+            const tierData = event.tickets[tier];
+            const sold = eventPurchases.filter(t => t.tier === tier).length;
+            const available = tierData.total - sold;
+
+            if (qty > available) {
+                alert('Not enough ' + tier.toUpperCase() + ' tickets available. Only ' + available + ' left.');
+                return;
+            }
+
+            // Generate individual tickets with unique IDs and QR codes
+            for (let i = 0; i < qty; i++) {
+                const ticketId = generateTicketId();
+                newTickets.push({
+                    ticketId: ticketId,
+                    eventId: eventId,
+                    eventTitle: event.title,
+                    eventDate: event.event_date || event.date,
+                    eventTime: event.event_time || event.time,
+                    eventVenue: event.venue,
+                    tier: tier,
+                    price: price,
+                    bookingFee: bookingFee,
+                    totalPrice: price + bookingFee,
+                    buyerId: currentUser.id,
+                    buyerName: currentUser.name,
+                    purchaseDate: new Date().toISOString()
+                });
+            }
+        }
+    });
+
+    if (!hasSelection) {
+        alert('Please select at least one ticket');
+        return;
+    }
+
+    if (newTickets.length === 0) return;
+
+    // Save purchased tickets
+    purchasedTickets.push(...newTickets);
+    localStorage.setItem('purchasedTickets', JSON.stringify(purchasedTickets));
+
+    // Close purchase modal
+    const purchaseModal = bootstrap.Modal.getInstance(document.getElementById('purchaseModal'));
+    if (purchaseModal) purchaseModal.hide();
+
+    // Show confirmation with QR codes
+    setTimeout(() => {
+        showTicketConfirmation(newTickets);
+    }, 300);
+}
+
+// Show ticket confirmation with unique QR codes
+function showTicketConfirmation(tickets) {
+    let ticketsHtml = '';
+
+    tickets.forEach((ticket, index) => {
+        ticketsHtml += `
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-1">${ticket.eventTitle}</h6>
+                            <p class="mb-1"><strong>Ticket ID:</strong> <code>${ticket.ticketId}</code></p>
+                            <p class="mb-1"><strong>Tier:</strong> ${ticket.tier.toUpperCase()}</p>
+                            <p class="mb-1"><strong>Date:</strong> ${formatDate(ticket.eventDate)}</p>
+                            <p class="mb-1"><strong>Time:</strong> ${ticket.eventTime}</p>
+                            <p class="mb-1"><strong>Venue:</strong> ${ticket.eventVenue}</p>
+                            <p class="mb-1"><strong>Price:</strong> GHS ${ticket.price.toFixed(2)}</p>
+                            <p class="mb-1"><strong>Booking Fee (10%):</strong> GHS ${ticket.bookingFee.toFixed(2)}</p>
+                            <p class="mb-0"><strong>Total:</strong> GHS ${ticket.totalPrice.toFixed(2)}</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div id="qrcode-${index}" class="qr-code-container mb-2"></div>
+                            <small class="text-muted">${ticket.ticketId}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    document.getElementById('ticketsList').innerHTML = ticketsHtml;
+
+    const confirmModal = new bootstrap.Modal(document.getElementById('ticketConfirmationModal'));
+    confirmModal.show();
+
+    // Generate QR codes after modal is shown
+    setTimeout(() => {
+        tickets.forEach((ticket, index) => {
+            const qrContainer = document.getElementById('qrcode-' + index);
+            if (qrContainer) {
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: JSON.stringify({
+                        ticketId: ticket.ticketId,
+                        event: ticket.eventTitle,
+                        tier: ticket.tier,
+                        date: ticket.eventDate,
+                        buyer: ticket.buyerName
+                    }),
+                    width: 128,
+                    height: 128,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+        });
+    }, 500);
+}
+
+// Handle print tickets
+function handlePrintTickets() {
+    const ticketsList = document.getElementById('ticketsList');
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Event Tickets</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .ticket { border: 2px dashed #333; padding: 20px; margin-bottom: 20px; page-break-inside: avoid; }
+                .ticket-header { text-align: center; margin-bottom: 15px; }
+                .ticket-details { display: flex; justify-content: space-between; }
+                .ticket-info { flex: 1; }
+                .ticket-qr { text-align: center; }
+                .ticket-id { font-family: monospace; font-size: 14px; text-align: center; margin-top: 5px; }
+                code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+            </style>
+        </head>
+        <body>
+            ${ticketsList.innerHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    setTimeout(() => {
+        printWindow.print();
+    }, 1000);
 }

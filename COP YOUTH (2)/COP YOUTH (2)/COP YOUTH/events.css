@@ -136,3 +136,34 @@
         margin-bottom: 20px;
     }
 }
+
+/* QR Code and Ticket Styles */
+.qr-code-container {
+    display: inline-block;
+    padding: 10px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+.ticket-qty {
+    width: 80px;
+}
+
+#purchaseSummary {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+#ticketsList .card {
+    border-left: 4px solid #001e3c;
+}
+
+#ticketsList .card code {
+    font-size: 0.9rem;
+    color: #001e3c;
+    background-color: #e8f0fe;
+    padding: 2px 8px;
+    border-radius: 3px;
+}

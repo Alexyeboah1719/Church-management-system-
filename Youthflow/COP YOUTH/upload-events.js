@@ -373,6 +373,25 @@ async function addNewEvent() {
             return;
         }
         
+        // Gather ticket tier data
+        const tickets = {
+            regular: {
+                price: parseFloat(document.getElementById('regularPrice').value) || 0,
+                total: parseInt(document.getElementById('regularQty').value) || 0,
+                available: parseInt(document.getElementById('regularQty').value) || 0
+            },
+            vip: {
+                price: parseFloat(document.getElementById('vipPrice').value) || 0,
+                total: parseInt(document.getElementById('vipQty').value) || 0,
+                available: parseInt(document.getElementById('vipQty').value) || 0
+            },
+            vvip: {
+                price: parseFloat(document.getElementById('vvipPrice').value) || 0,
+                total: parseInt(document.getElementById('vvipQty').value) || 0,
+                available: parseInt(document.getElementById('vvipQty').value) || 0
+            }
+        };
+
         // Create new event with generated ID
         const newEvent = {
             id: Date.now().toString(),
@@ -382,6 +401,7 @@ async function addNewEvent() {
             event_time: time,
             venue: venue,
             event_type: type,
+            tickets: tickets,
             created_by: currentUser.name
         };
         
@@ -435,6 +455,16 @@ async function editEvent(eventId) {
         document.getElementById('editEventTime').value = event.event_time || event.time;
         document.getElementById('editEventVenue').value = event.venue;
         document.getElementById('editEventType').value = event.event_type || event.type || 'special-event';
+
+        // Fill ticket tier data
+        if (event.tickets) {
+            document.getElementById('editRegularPrice').value = event.tickets.regular ? event.tickets.regular.price : '';
+            document.getElementById('editRegularQty').value = event.tickets.regular ? event.tickets.regular.total : '';
+            document.getElementById('editVipPrice').value = event.tickets.vip ? event.tickets.vip.price : '';
+            document.getElementById('editVipQty').value = event.tickets.vip ? event.tickets.vip.total : '';
+            document.getElementById('editVvipPrice').value = event.tickets.vvip ? event.tickets.vvip.price : '';
+            document.getElementById('editVvipQty').value = event.tickets.vvip ? event.tickets.vvip.total : '';
+        }
         
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
@@ -461,13 +491,43 @@ async function updateEvent() {
     }
     
     try {
+        // Gather ticket tier data for update
+        const tickets = {
+            regular: {
+                price: parseFloat(document.getElementById('editRegularPrice').value) || 0,
+                total: parseInt(document.getElementById('editRegularQty').value) || 0,
+                available: parseInt(document.getElementById('editRegularQty').value) || 0
+            },
+            vip: {
+                price: parseFloat(document.getElementById('editVipPrice').value) || 0,
+                total: parseInt(document.getElementById('editVipQty').value) || 0,
+                available: parseInt(document.getElementById('editVipQty').value) || 0
+            },
+            vvip: {
+                price: parseFloat(document.getElementById('editVvipPrice').value) || 0,
+                total: parseInt(document.getElementById('editVvipQty').value) || 0,
+                available: parseInt(document.getElementById('editVvipQty').value) || 0
+            }
+        };
+
+        // Recalculate available based on sold tickets
+        const existingEvents = JSON.parse(localStorage.getItem('events') || '[]');
+        const existingEvent = existingEvents.find(e => e.id === eventId);
+        const purchasedTickets = JSON.parse(localStorage.getItem('purchasedTickets') || '[]');
+        const eventPurchases = purchasedTickets.filter(t => t.eventId === eventId);
+        ['regular', 'vip', 'vvip'].forEach(tier => {
+            const sold = eventPurchases.filter(t => t.tier === tier).length;
+            tickets[tier].available = Math.max(0, tickets[tier].total - sold);
+        });
+
         const updates = {
             title: title,
             description: description,
             event_date: date,
             event_time: time,
             venue: venue,
-            event_type: type
+            event_type: type,
+            tickets: tickets
         };
         
         // Update event in localStorage
