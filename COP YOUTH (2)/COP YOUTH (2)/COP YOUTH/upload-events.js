@@ -1,11 +1,6 @@
 // Admin Events Management functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Wait for Supabase to be ready
-    if (window.supabaseReady) {
-        initializeEvents();
-    } else {
-        window.addEventListener('supabaseReady', initializeEvents);
-    }
+    initializeEvents();
 });
 
 function initializeEvents() {
@@ -24,7 +19,7 @@ function checkAdminAuth() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     
     if (!currentUser || currentUser.type !== 'admin') {
-        window.location.href = 'auth.html?admin=true';
+        window.location.href = 'index.html'
         return;
     }
     
@@ -46,7 +41,7 @@ function setupEventsEventListeners() {
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', function() {
         localStorage.removeItem('currentUser');
-        window.location.href = 'index.html?admin=true';
+        window.location.href = 'auth.html?admin=true';
     });
     
     // Add event
@@ -87,14 +82,9 @@ function toggleSidebar() {
 // Load all events data
 async function loadEventsData() {
     try {
-        const eventsResult = await window.supabaseDB.getEvents();
-        const events = eventsResult.success ? eventsResult.data : [];
-        
-        const attendanceResult = await window.supabaseDB.getAttendance();
-        const attendance = attendanceResult.success ? attendanceResult.data : [];
-        
-        const membersResult = await window.supabaseDB.getMembers();
-        const members = membersResult.success ? membersResult.data : [];
+        const events = JSON.parse(localStorage.getItem('events') || '[]');
+        const attendance = JSON.parse(localStorage.getItem('attendance') || '[]');
+        const members = JSON.parse(localStorage.getItem('members') || '[]');
         const approvedMembers = members.filter(m => m.status === 'approved' && m.active);
         
         const now = new Date().setHours(0, 0, 0, 0);
@@ -376,35 +366,70 @@ async function addNewEvent() {
     }
     
     try {
-        // Create new event (don't include id - Supabase will auto-generate UUID)
+        // Get current user
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            alert('You must be logged in to create events');
+            return;
+        }
+        
+        // Gather ticket tier data
+        const tickets = {
+            regular: {
+                price: parseFloat(document.getElementById('regularPrice').value) || 0,
+                total: parseInt(document.getElementById('regularQty').value) || 0,
+                available: parseInt(document.getElementById('regularQty').value) || 0
+            },
+            vip: {
+                price: parseFloat(document.getElementById('vipPrice').value) || 0,
+                total: parseInt(document.getElementById('vipQty').value) || 0,
+                available: parseInt(document.getElementById('vipQty').value) || 0
+            },
+            vvip: {
+                price: parseFloat(document.getElementById('vvipPrice').value) || 0,
+                total: parseInt(document.getElementById('vvipQty').value) || 0,
+                available: parseInt(document.getElementById('vvipQty').value) || 0
+            }
+        };
+
+        // Create new event with generated ID
         const newEvent = {
+            id: Date.now().toString(),
             title: title,
             description: description,
             event_date: date,
             event_time: time,
             venue: venue,
             event_type: type,
-            created_by: JSON.parse(localStorage.getItem('currentUser')).name
+            tickets: tickets,
+            created_by: currentUser.name
         };
         
-        const result = await window.supabaseDB.createEvent(newEvent);
+        // Save to localStorage
+        const events = JSON.parse(localStorage.getItem('events') || '[]');
+        events.push(newEvent);
+        localStorage.setItem('events', JSON.stringify(events));
         
-        if (result.success) {
-            // Close modal and reset form
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addEventModal'));
-            modal.hide();
-            document.getElementById('addEventForm').reset();
-            
-            // Reload data
-            loadEventsData();
-            
-            // Record activity
-            await recordAdminActivity(`Created new event: ${title}`);
-            
-            alert('Event created successfully!');
-        } else {
-            alert('Failed to create event: ' + result.error);
+        // Close modal and reset form
+        const modalElement = document.getElementById('addEventModal');
+        const formElement = document.getElementById('addEventForm');
+        
+        if (modalElement && formElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+            formElement.reset();
         }
+        
+        // Reload data
+        loadEventsData();
+        
+        // Refresh admin dashboard attendance dropdown
+        refreshAdminDashboardAttendance();
+        
+        // Record activity
+        await recordAdminActivity(`Created new event: ${title}`);
+        
+        alert('Event created successfully!');
     } catch (error) {
         console.error('Error creating event:', error);
         alert('Failed to create event. Please try again.');
@@ -414,8 +439,7 @@ async function addNewEvent() {
 // Edit event
 async function editEvent(eventId) {
     try {
-        const eventsResult = await window.supabaseDB.getEvents();
-        const events = eventsResult.success ? eventsResult.data : [];
+        const events = JSON.parse(localStorage.getItem('events') || '[]');
         const event = events.find(e => e.id === eventId);
         
         if (!event) {
@@ -431,6 +455,16 @@ async function editEvent(eventId) {
         document.getElementById('editEventTime').value = event.event_time || event.time;
         document.getElementById('editEventVenue').value = event.venue;
         document.getElementById('editEventType').value = event.event_type || event.type || 'special-event';
+
+        // Fill ticket tier data
+        if (event.tickets) {
+            document.getElementById('editRegularPrice').value = event.tickets.regular ? event.tickets.regular.price : '';
+            document.getElementById('editRegularQty').value = event.tickets.regular ? event.tickets.regular.total : '';
+            document.getElementById('editVipPrice').value = event.tickets.vip ? event.tickets.vip.price : '';
+            document.getElementById('editVipQty').value = event.tickets.vip ? event.tickets.vip.total : '';
+            document.getElementById('editVvipPrice').value = event.tickets.vvip ? event.tickets.vvip.price : '';
+            document.getElementById('editVvipQty').value = event.tickets.vvip ? event.tickets.vvip.total : '';
+        }
         
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
@@ -457,134 +491,71 @@ async function updateEvent() {
     }
     
     try {
+        // Gather ticket tier data for update
+        const tickets = {
+            regular: {
+                price: parseFloat(document.getElementById('editRegularPrice').value) || 0,
+                total: parseInt(document.getElementById('editRegularQty').value) || 0,
+                available: parseInt(document.getElementById('editRegularQty').value) || 0
+            },
+            vip: {
+                price: parseFloat(document.getElementById('editVipPrice').value) || 0,
+                total: parseInt(document.getElementById('editVipQty').value) || 0,
+                available: parseInt(document.getElementById('editVipQty').value) || 0
+            },
+            vvip: {
+                price: parseFloat(document.getElementById('editVvipPrice').value) || 0,
+                total: parseInt(document.getElementById('editVvipQty').value) || 0,
+                available: parseInt(document.getElementById('editVvipQty').value) || 0
+            }
+        };
+
+        // Recalculate available based on sold tickets
+        const existingEvents = JSON.parse(localStorage.getItem('events') || '[]');
+        const existingEvent = existingEvents.find(e => e.id === eventId);
+        const purchasedTickets = JSON.parse(localStorage.getItem('purchasedTickets') || '[]');
+        const eventPurchases = purchasedTickets.filter(t => t.eventId === eventId);
+        ['regular', 'vip', 'vvip'].forEach(tier => {
+            const sold = eventPurchases.filter(t => t.tier === tier).length;
+            tickets[tier].available = Math.max(0, tickets[tier].total - sold);
+        });
+
         const updates = {
             title: title,
             description: description,
             event_date: date,
             event_time: time,
             venue: venue,
-            event_type: type
+            event_type: type,
+            tickets: tickets
         };
         
-        const result = await window.supabaseDB.updateEvent(eventId, updates);
+        // Update event in localStorage
+        const events = JSON.parse(localStorage.getItem('events') || '[]');
+        const eventIndex = events.findIndex(e => e.id === eventId);
         
-        if (result.success) {
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
-            modal.hide();
-            
-            // Reload data
-            loadEventsData();
-            
-            // Record activity
-            await recordAdminActivity(`Updated event: ${title}`);
-            
-            alert('Event updated successfully!');
-        } else {
-            alert('Failed to update event: ' + result.error);
-        }
-    } catch (error) {
-        console.error('Error updating event:', error);
-        alert('Failed to update event. Please try again.');
-    }
-}
-
-// View event details
-async function viewEventDetails(eventId) {
-    try {
-        const eventsResult = await window.supabaseDB.getEvents();
-        const events = eventsResult.success ? eventsResult.data : [];
-        const event = events.find(e => e.id === eventId);
-        
-        const attendanceResult = await window.supabaseDB.getAttendance();
-        const attendance = attendanceResult.success ? attendanceResult.data : [];
-        
-        const membersResult = await window.supabaseDB.getMembers();
-        const members = membersResult.success ? membersResult.data : [];
-        
-        if (!event) {
+        if (eventIndex === -1) {
             alert('Event not found');
             return;
         }
         
-        const eventAttendance = attendance.filter(a => a.event_id === eventId);
-        const totalMembers = members.filter(m => m.status === 'approved' && m.active).length;
-        const attendancePercentage = totalMembers > 0 ? Math.round((eventAttendance.length / totalMembers) * 100) : 0;
+        events[eventIndex] = { ...events[eventIndex], ...updates };
+        localStorage.setItem('events', JSON.stringify(events));
         
-        // Get members who attended
-        const attendedMembers = eventAttendance.map(att => {
-            const member = members.find(m => m.id === att.member_id);
-            return member ? member.name : 'Unknown Member';
-        });
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
+        modal.hide();
         
-        // Update modal content
-        document.getElementById('eventDetailsContent').innerHTML = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Event Information</h5>
-                    <p><strong>Title:</strong> ${event.title}</p>
-                    <p><strong>Date:</strong> ${formatDate(event.event_date || event.date)}</p>
-                    <p><strong>Time:</strong> ${event.event_time || event.time}</p>
-                    <p><strong>Venue:</strong> ${event.venue}</p>
-                    <p><strong>Type:</strong> ${getEventTypeLabel(event.event_type || event.type)}</p>
-                    ${event.description ? `<p><strong>Description:</strong> ${event.description}</p>` : ''}
-                </div>
-                <div class="col-md-6">
-                    <h5>Attendance Summary</h5>
-                    <p><strong>Total Attendance:</strong> ${eventAttendance.length}/${totalMembers}</p>
-                    <p><strong>Attendance Rate:</strong> ${attendancePercentage}%</p>
-                    
-                    <h6 class="mt-3">Members Present:</h6>
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        ${attendedMembers.length > 0 ? 
-                            attendedMembers.map(name => `<div class="border-bottom py-1">${name}</div>`).join('') :
-                            '<p class="text-muted">No attendance recorded</p>'
-                        }
-                    </div>
-                </div>
-            </div>
-        `;
+        // Reload data
+        loadEventsData();
         
-        // Store event ID for printing
-        document.getElementById('printAttendance').dataset.eventId = eventId;
+        // Record activity
+        await recordAdminActivity(`Updated event: ${title}`);
         
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
-        modal.show();
+        alert('Event updated successfully!');
     } catch (error) {
-        console.error('Error viewing event details:', error);
-        alert('Failed to load event details. Please try again.');
-    }
-}
-
-// Delete event
-async function deleteEvent(eventId) {
-    if (!confirm('Are you sure you want to delete this event? This will also delete all attendance records for this event.')) {
-        return;
-    }
-    
-    try {
-        // Get event title before deleting
-        const eventsResult = await window.supabaseDB.getEvents();
-        const event = eventsResult.data.find(e => e.id === eventId);
-        const eventTitle = event ? event.title : 'Unknown';
-        
-        const result = await window.supabaseDB.deleteEvent(eventId);
-        
-        if (result.success) {
-            // Record activity
-            await recordAdminActivity(`Deleted event: ${eventTitle}`);
-            
-            // Reload data
-            loadEventsData();
-            
-            alert('Event deleted successfully!');
-        } else {
-            alert('Failed to delete event: ' + result.error);
-        }
-    } catch (error) {
-        console.error('Error deleting event:', error);
-        alert('Failed to delete event. Please try again.');
+        console.error('Error updating event:', error);
+        alert('Failed to update event. Please try again.');
     }
 }
 
@@ -735,10 +706,43 @@ function formatTime(timeString) {
     return `${hour}:${minute} ${period}`;
 }
 
+// Refresh admin dashboard attendance dropdown
+function refreshAdminDashboardAttendance() {
+    try {
+        // Trigger a storage event to notify admin dashboard
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'events',
+            newValue: localStorage.getItem('events')
+        }));
+        
+        // Also try to directly update if admin dashboard is open in same window
+        if (typeof loadEventsForAttendance === 'function') {
+            loadEventsForAttendance();
+        }
+    } catch (error) {
+        console.log('Admin dashboard not in same window, but storage event should update it');
+    }
+}
+
 // Record admin activity
 async function recordAdminActivity(description) {
     try {
-        await window.supabaseDB.logAdminActivity(description);
+        // Get current user safely
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            console.warn('No current user found, skipping activity recording');
+            return;
+        }
+        
+        // Store activity in localStorage
+        const activities = JSON.parse(localStorage.getItem('adminActivities') || '[]');
+        activities.push({
+            id: Date.now().toString(),
+            description: description,
+            timestamp: new Date().toISOString(),
+            admin: currentUser.name
+        });
+        localStorage.setItem('adminActivities', JSON.stringify(activities));
     } catch (error) {
         console.error('Error recording admin activity:', error);
     }
