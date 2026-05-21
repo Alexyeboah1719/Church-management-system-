@@ -1,0 +1,365 @@
+/* Admin Daily Verse Management Styles */
+.sidebar {
+    background-color: #001e3c;
+    color: white;
+    min-height: 100vh;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 20px 15px;
+    background-color: #001225;
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 15px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+.sidebar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+/* Verse Preview Card */
+.verse-preview-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #001e3c 0%, #003366 100%);
+    color: white;
+}
+
+.verse-preview-card .card-header {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.verse-preview-card .card-body {
+    padding: 40px 30px;
+}
+
+.verse-preview-card .lead {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+.verse-preview-card h5 {
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+/* Table Styles */
+.table th {
+    background-color: #001e3c;
+    color: white;
+    border-color: #001e3c;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 30, 60, 0.05);
+}
+
+/* Verse Text */
+.verse-text {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-style: italic;
+}
+
+.verse-text-full {
+    font-style: italic;
+    line-height: 1.6;
+}
+
+/* Status Badges */
+.badge-status-active {
+    background-color: #198754;
+}
+
+.badge-status-upcoming {
+    background-color: #0dcaf0;
+    color: #001e3c;
+}
+
+.badge-status-past {
+    background-color: #6c757d;
+}
+
+/* Category Badges */
+.badge-category {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+.category-encouragement {
+    background-color: #198754;
+    color: white;
+}
+
+.category-faith {
+    background-color: #001e3c;
+    color: white;
+}
+
+.category-hope {
+    background-color: #ffc107;
+    color: #001e3c;
+}
+
+.category-love {
+    background-color: #dc3545;
+    color: white;
+}
+
+.category-peace {
+    background-color: #0dcaf0;
+    color: #001e3c;
+}
+
+.category-strength {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.category-wisdom {
+    background-color: #6f42c1;
+    color: white;
+}
+
+/* Action Buttons */
+.btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Filter Buttons */
+.btn-group .btn-outline-primary.active {
+    background-color: #001e3c;
+    border-color: #001e3c;
+    color: white;
+}
+
+/* Saved Count */
+.saved-count {
+    font-weight: bold;
+    color: #001e3c;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .verse-preview-card .card-body {
+        padding: 25px 20px;
+    }
+    
+    .verse-preview-card .lead {
+        font-size: 1.2rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .verse-text {
+        max-width: 200px;
+    }
+    
+    .btn-group .btn {
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .verse-preview-card .lead {
+        font-size: 1.1rem;
+    }
+    
+    .verse-text {
+        max-width: 150px;
+    }
+    
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+}
+
+/* Animation for verse cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verse-preview-card {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Hover effects for verse rows */
+.verse-row:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Category color indicators */
+.category-indicator {
+    width: 4px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.category-encouragement .category-indicator {
+    background-color: #198754;
+}
+
+.category-faith .category-indicator {
+    background-color: #001e3c;
+}
+
+.category-hope .category-indicator {
+    background-color: #ffc107;
+}
+
+.category-love .category-indicator {
+    background-color: #dc3545;
+}
+
+.category-peace .category-indicator {
+    background-color: #0dcaf0;
+}
+
+.category-strength .category-indicator {
+    background-color: #fd7e14;
+}
+
+.category-wisdom .category-indicator {
+    background-color: #6f42c1;
+}
+
+/* Verse date styling */
+.verse-date {
+    font-weight: 500;
+}
+
+.verse-date.today {
+    color: #198754;
+    font-weight: bold;
+}
+
+.verse-date.future {
+    color: #0dcaf0;
+    font-weight: bold;
+}
+
+.verse-date.past {
+    color: #6c757d;
+}
+
+/* Loading states */
+.loading-verse {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading-verse::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #001e3c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success message styling */
+.alert-verse-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    border-left: 4px solid #198754;
+}
+
+/* Empty state styling */
+.empty-verses {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-verses i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-verses h4 {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.empty-verses p {
+    font-size: 1.1rem;
+    max-width: 400px;
+    margin: 0 auto;
+}

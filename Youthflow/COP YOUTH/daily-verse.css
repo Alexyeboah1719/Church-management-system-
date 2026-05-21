@@ -1,0 +1,151 @@
+/* Daily Verse Page Styles */
+.sidebar {
+    background-color: #001e3c;
+    color: white;
+    min-height: 100vh;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 20px 15px;
+    background-color: #001225;
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 15px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+.sidebar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+/* Verse Card */
+.verse-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #001e3c 0%, #003366 100%);
+    color: white;
+}
+
+.verse-card .card-header {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.verse-card .card-footer {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.verse-content {
+    padding: 30px 20px;
+}
+
+.verse-content p.lead {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.verse-content h5 {
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+/* Verse History */
+.verse-history-item {
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.verse-history-item:last-child {
+    margin-bottom: 0;
+}
+
+.verse-history-text {
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.verse-history-reference {
+    font-weight: bold;
+    color: #001e3c;
+}
+
+.verse-history-date {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Buttons */
+.btn-outline-primary {
+    color: white;
+    border-color: white;
+}
+
+.btn-outline-primary:hover {
+    background-color: white;
+    color: #001e3c;
+}
+
+.btn-outline-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #001e3c;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .verse-content p.lead {
+        font-size: 1.25rem;
+    }
+    
+    .verse-card {
+        margin: 0 10px;
+    }
+}

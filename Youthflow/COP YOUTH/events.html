@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Church Youth System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="Events.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="sidebar-header d-flex justify-content-between align-items-center">
+                        <img src="images/YOUTH-MINISTRY-LOGO 2.png" alt="Church Logo" height="40">
+                        <h5 class="ms-2 mb-0">Youthflow</h5> <br>
+                        <button class="btn btn-sm d-md-none" id="sidebarToggle">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <hr>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="member-dashboard.html">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <i class="fas fa-user me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Register.html">
+                                <i class="fas fa-users me-2"></i>
+                                Members Register
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="events.html">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Events
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="announcements.html">
+                                <i class="fas fa-bullhorn me-2"></i>
+                                Announcements
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="task.html">
+                                <i class="fas fa-tasks me-2"></i>
+                                My Tasks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="daily-verse.html">
+                                <i class="fas fa-bible me-2"></i>
+                                Daily Verse
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="messages.html">
+                                <i class="fas fa-envelope me-2"></i>
+                                Messages
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link text-danger" href="#" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 ml-sm-auto px-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-3 border-bottom">
+                    <button class="btn btn-sm d-md-none" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="h2">Church Events</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <span class="navbar-text me-3">
+                                Welcome, <span id="userName">Member</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Filter -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" data-filter="all">All Events</button>
+                            <button type="button" class="btn btn-outline-primary" data-filter="upcoming">Upcoming</button>
+                            <button type="button" class="btn btn-outline-primary" data-filter="past">Past</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search events..." id="searchEvents">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events List -->
+                <div class="row" id="eventsList">
+                    <!-- Events will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalTitle">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="eventDetails">
+                        <!-- Event details will be loaded here -->
+                    </div>
+                    
+                    <!-- Comments Section -->
+                    <div class="mt-4">
+                        <h6>Comments</h6>
+                        <div id="eventComments">
+                            <!-- Comments will be loaded here -->
+                        </div>
+                        <form id="commentForm" class="mt-3">
+                            <input type="hidden" id="commentEventId">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Add a comment..." id="commentText" required>
+                                <button class="btn btn-primary" type="submit">Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="Events.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+/* Announcements Page Styles */
+.sidebar {
+    background-color: #001e3c;
+    color: white;
+    min-height: 100vh;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 20px 15px;
+    background-color: #001225;
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 15px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+.sidebar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+/* Announcement Cards */
+.announcement-card {
+    border-left: 4px solid #ffc107;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+}
+
+.announcement-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.announcement-card.important {
+    border-left-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.announcement-card.urgent {
+    border-left-color: #fd7e14;
+    background-color: #fff4e6;
+}
+
+.announcement-date {
+    background-color: #001e3c;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.announcement-date .day {
+    font-size: 1.25rem;
+    font-weight: bold;
+    display: block;
+}
+
+.announcement-date .month {
+    font-size: 0.75rem;
+    display: block;
+}
+
+/* Reaction Buttons */
+.reaction-btn {
+    border: none;
+    background: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: all 0.3s;
+    font-size: 0.875rem;
+}
+
+.reaction-btn:hover {
+    background-color: #f8f9fa;
+}
+
+.reaction-btn.active {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+/* Comments */
+.comment {
+    border-left: 3px solid #001e3c;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.comment-author {
+    font-weight: bold;
+    color: #001e3c;
+    font-size: 0.875rem;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.comment-text {
+    margin: 5px 0;
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .announcement-card {
+        margin-bottom: 15px;
+    }
+    
+    .announcement-date {
+        min-width: 60px;
+    }
+}

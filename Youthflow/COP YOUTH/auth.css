@@ -1,0 +1,192 @@
+/* Common Styles */
+:root {
+    --primary-blue: #1a237e;
+    --dark-blue: #0d1452;
+    --gold: #ffc107;
+    --light-gold: #ffecb3;
+    --white: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Landing Page Styles */
+.landing-page {
+    background: linear-gradient(rgba(26, 35, 126, 0.8), rgba(13, 20, 82, 0.9)), url('images/YOUTH-MINISTRY-LOGO\ 2.png') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--white);
+    min-height: 100vh;
+}
+
+.landing-page .navbar {
+    background-color: rgba(13, 20, 82, 0.9);
+}
+
+.landing-page .navbar-brand {
+    font-weight: bold;
+    color: var(--gold);
+}
+
+.landing-page .nav-link {
+    color: var(--white) !important;
+}
+
+.landing-page .nav-link:hover {
+    color: var(--gold) !important;
+}
+
+.hero-section {
+    padding: 120px 0;
+}
+
+.hero-content h1 {
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.btn-primary {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark-blue);
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: var(--dark-blue);
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.features-section {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.feature-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.3s;
+    color: var(--white);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.feature-card i {
+    color: var(--gold);
+}
+
+footer {
+    background-color: rgba(13, 20, 82, 0.9);
+}
+
+/* Auth Page Styles */
+.auth-page {
+    background: linear-gradient(rgba(26, 35, 126, 0.8), rgba(13, 20, 82, 0.9)), url('images/YOUTH-MINISTRY-LOGO\ 2.png') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.auth-header h2 {
+    color: var(--primary-blue);
+    font-weight: 700;
+}
+
+.auth-header p {
+    color: #666;
+}
+
+.auth-tabs .nav-pills .nav-link {
+    color: var(--primary-blue);
+    background-color: transparent;
+    border-radius: 5px;
+    margin: 0 2px;
+}
+
+.auth-tabs .nav-pills .nav-link.active {
+    background-color: var(--primary-blue);
+    color: var(--white);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 10px 15px;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 38px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 20px;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+}
